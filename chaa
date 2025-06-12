@@ -1,0 +1,931 @@
+[Restrictions]
+
+Execution Time
+
+2 sec (C++) / 3 sec (Java) for 25 test cases combined
+
+Memory Limit
+
+Maximum 256MB is available for heap and static memory combined (Note: Maximum 1MB can be used for stack)
+
+
+ 
+
+  ①   Test takers who will be using C or C++ to write their answer,
+
+  ㅇ   please select C++ as for the Language before submitting the answer.
+
+  ②   Consists of the Main part and User Code part.
+
+  ㅇ   A.  Main Part         : Cannot be edited. But note that a validation logic can be added in here
+
+  ㅇ   A.  Main Part         : for the purposes of solution evaluation such as to detect an abnormal solution.
+
+  ㅇ   B.  User Code Part  : Code which the test taker must actually write.
+
+  ㅇ   B.  User Code Part  : Make sure that standard input/output functions are NOT included when submitting the code.
+
+  ③   Cautions When Programming on Local PC
+
+  ㅇ   A.  2 files must be generated. ( main.cpp / solution.cpp or Solution.java / UserSolution.java )
+
+  ㅇ   B.  Please copy the Main part into main.cpp or Solution.java.
+
+  ㅇ   C.  To use the sample_input.txt, uncomment the code (commented)
+
+  ㅇ   C.  which uses the file as the standard input within the Main part code.
+
+  ㅇ   D.  Delete or comment all standard input/output functions for debugging before submitting your code.
+
+  ④   Since not all constraints are specified in this document, analyze the given code for further information.
+
+  ⑤   Given codes can differ depending on the programming language. Analyze codes according to your language selection.
+
+ 
+
+ 
+
+[Problem Description]
+
+There is a café that offers N different types of beverages. Each beverage has a unique number ranging from 1 to N.
+
+ 
+
+You take orders from customers.
+
+Each order is made up of various types of beverages. There can be multiple beverages of the same type within an order.
+
+ 
+
+When a specific beverage is made, it is assigned to the earliest arriving order from the ones that include it, and then removed from the order.
+
+When all beverages in an order are made, they are delivered to the customer, and the order is then removed.
+
+If no order includes the specific beverage that has already been made, the beverage is immediately discarded.
+
+ 
+
+Customers can cancel their orders.
+
+If an order is canceled, the beverages assigned to that order will be reassigned to other orders. The reassignment process is the same as the original assignment process.
+
+Beverages that can’t be reassigned to any order will be discarded immediately, and the canceled order will be removed.
+
+ 
+
+For example, let’s say there are three orders: Order 1 that includes Beverages 1, 1, 3, and 4; Order 2 that includes Beverages 1 and 2; and Order 3 that includes Beverages 1, 2, and 3. Order 1 arrived before Order 2, and Order 2 arrived before Order 3.
+
+When Beverage 1 is made, it is assigned to Order 1. Then, Beverage 1 will be removed from Order 1, leaving only Beverages 1, 3, and 4 in the order.
+
+When Beverage 2 is made, it is assigned to Order 2. Then, Beverage 2 will be removed from Order 2, leaving only Beverage 1 in the order.
+
+When Beverage 3 is made, it is assigned to Order 1. Then, Beverage 3 will be removed from Order 1, leaving only Beverages 1 and 4 in the order.
+
+When Beverage 4 is made, it is assigned to Order 1. Then, Beverage 4 will be removed from Order 1, leaving only Beverage 1 in the order.
+
+When Order 1 is canceled, Beverage 1 in Order 1 is reassigned to Order 2, and Beverage 3 is reassigned to Order 3. However, since Beverage 4 in Order 1 has no order to be reassigned to, it will be discarded.
+
+Beverage 1 in Order 2 is removed, and since all beverages in the order have been made and delivered to the customer, the order will then be removed.
+
+Beverage 3 in Order 3 is removed, leaving only Beverages 1 and 2 in the order.
+
+ 
+
+If all beverages in an order have been made and delivered to the customer, the order cannot be canceled.
+
+ 
+
+Additionally, up to five most urgent orders are displayed.
+
+The most urgent order to complete is the one with the highest number of beverages remaining. If there are multiple such orders, the one that arrives earliest is prioritized.
+
+ 
+
+Implement each required function by referring to the following API description.
+
+※ The function signature below is based on C/C++. As for other languages, refer to the provided Main and User Code.
+
+ 
+
+The following is the description of API to be written in the User Code.
+
+void init(int N)
+
+This function is an initialization function for test cases.
+
+This function is called once at the beginning of each test case.
+
+ 
+
+A café offers N types of beverages. Each beverage is identified by a number ranging from 1 to N.
+
+ 
+
+Initially, no orders have been placed.
+
+ 
+
+Parameters
+
+  N : Number of beverage types (3 ≤ N ≤ 10)
+
+int order(int mID, int M, int mBeverages[])
+
+This function takes an order with ID mID, made up of M beverages. Then, it returns the number of remaining orders, including the new order.
+
+ 
+
+Each beverage that makes up an order is given as mBeverages[i]. (0 ≤ i ≤ M – 1)
+
+There can be multiple beverages of the same type within an order.
+
+ 
+
+The order created after the function was called first is the one that arrived earlier.
+
+ 
+
+It is guaranteed that the mID value passed when the function is called will not be the same as the value passed in any previous function call.
+
+ 
+
+Parameters
+
+  mID : ID of the order (1 ≤ mID ≤ 1,000,000,000)
+
+  M : Number of beverages that make up an order (1 ≤ M ≤ 10)
+
+  mBeverages : Beverages that make up an order (1 ≤ mBeverages[] ≤ N)
+
+ 
+
+Return Value
+
+  Number of remaining orders is returned.
+
+int supply(int mBeverage)
+
+This function makes and delivers a beverage whose type is mBeverage.
+
+ 
+
+Beverage mBeverage will be assigned to the earliest arriving order that includes it.
+
+Once the beverage is assigned, one Beverage mBeverage will be removed from the order.
+
+ 
+
+If the beverage is successfully assigned to the order, the ID of the assigned order is returned; if the assignment fails, -1 is returned.
+
+ 
+
+A failing assignment occurs when Beverage mBeverage doesn’t exist in any of the remaining orders. In this case, the beverage that has already been made will be discarded immediately and will not be used again.
+
+ 
+
+If all beverages in the order are made and delivered to the customer, the order will be removed.
+
+ 
+
+Parameters
+
+mBeverage : Beverage that has been made (1 ≤ mBeverage ≤ N)
+
+ 
+
+Return Value
+
+ID of the order to which Beverage mBeverage was assigned is returned; if the assignment fails, -1 is returned.
+
+int cancel(int mID)
+
+This function cancels Order mID and returns the number of beverages remaining in the order before Order mID was canceled.
+
+ 
+
+If Order mID is canceled, the beverages assigned to it will be reassigned. The reassignment process is the same as the original assignment process.
+
+In other words, each beverage will be reassigned to the earliest arriving order that includes it, and that beverage will be removed from that order.
+
+ 
+
+If all beverages in Order mID have already been made and delivered to the customer, the order cannot be canceled, and 0 is returned.
+
+If Order mID has already been canceled, it cannot be canceled again, and -1 is returned.
+
+ 
+
+It is guaranteed that Order mID is the one that has already been taken.
+
+ 
+
+Parameters
+
+  mID : ID of the order to be canceled (1 ≤ mID ≤ 1,000,000,000)
+
+ 
+
+Return Value
+
+  Number of beverages remaining before the order was canceled is returned. If the order was completed, 0 is returned; if it was already canceled, -1 is returned.
+
+int getStatus(int mID)
+
+This function returns the number of beverages remaining in Order mID.
+
+ 
+
+If all beverages in Order mID are made and delivered to the customer, 0 is returned.
+
+If Order mID has been canceled, -1 is returned.
+
+ 
+
+It is guaranteed that Order mID is the one that has already been taken.
+
+ 
+
+Parameters
+
+mID : ID of the order for checking the remaining beverages (1 ≤ mID ≤ 1,000,000,000)
+
+ 
+
+Return Value
+
+  Number of beverages remaining in Order mID is returned. If the order was completed, 0 is returned; if it was canceled, -1 is returned.
+
+RESULT hurry()
+
+This function finds up to five of the most urgent orders from remaining orders, stores them in the RESULT struct, and then returns it.
+
+ 
+
+Number of orders found during the return process is stored in RESULT.cnt, and the ID for the ith most urgent order is stored in RESULT.IDs[i – 1]. (1 ≤ i ≤ RESULT.cnt)
+
+ 
+
+The most urgent order is the one with the highest number of beverages remaining. If there are multiple such orders, the one that arrives earliest should be prioritized.
+
+ 
+
+ 
+
+Return Value
+
+  RESULT.cnt : Number of the most urgent orders
+
+  RESULT.IDs : IDs of the most urgent orders
+
+ 
+
+ 
+
+[Example]
+
+Let’s consider a case in which the functions are called, as shown in [Table 1].
+
+Order
+
+Function
+
+Return
+
+Description
+
+1
+
+init(3)
+
+ 
+
+There are three types of beverages.
+
+2
+
+order(111, 3, {1, 3, 3})
+
+1
+
+Order 111, which is made up of Beverages 1, 3, and 3, is taken.
+
+The remaining order is Order 111.
+
+3
+
+order(222, 3, {2, 2, 3})
+
+2
+
+Order 222, which is made up of Beverages 2, 2, and 3, is taken.
+
+The remaining orders are Orders 111 and 222.
+
+4
+
+hurry()
+
+RESULT = {2, {111, 222}}
+
+Both Orders 111 and 222 have three beverages remaining. Since Order 111 arrived earlier, it is the most urgent order, followed by Order 222.
+
+5
+
+supply(3)
+
+111
+
+Beverage 3 is made and assigned to Order 111.
+
+In Order 111, only Beverages 1 and 3 remain.
+
+6
+
+hurry()
+
+{2, {222, 111}}
+
+Orders 111 and 222 have 2 and 3 beverages remaining, respectively. The most urgent orders are Order 222, followed by Order 111.
+
+7
+
+getStatus(111)
+
+2
+
+Since Beverages 1 and 3 remain in Order 111, the number of beverages remaining is two.
+
+8
+
+supply(1)
+
+111
+
+Beverage 1 is made and assigned to Order 111.
+
+In Order 111, only Beverage 3 remains.
+
+9
+
+order(333, 1, {3})
+
+3
+
+Order 333, which is made up of Beverage 3, is taken.
+
+The remaining orders are Orders 111, 222, and 333.
+
+10
+
+cancel(111)
+
+1
+
+Order 111 is canceled. Beverage 3, which was originally assigned to Order 111, is reassigned to Order 222, and Beverage 1 is discarded. In Order 222, only Beverages 2 and 2 remain.
+
+11
+
+supply(3)
+
+333
+
+Beverage 3 is made and assigned to Order 333. All beverages in Order 333 are made and delivered to the customer.
+
+12
+
+order(444, 1, {3})
+
+2
+
+Order 444, which is made up of Beverage 3, is taken.
+
+The remaining orders are Orders 222 and 444.
+
+13
+
+supply(2)
+
+222
+
+Beverage 2 is made and assigned to Order 222.
+
+In Order 222, only Beverage 2 remains.
+
+14
+
+supply(3)
+
+444
+
+Beverage 3 is made and assigned to Order 444.
+
+All beverages in Order 444 are made and delivered to the customer.
+
+15
+
+supply(3)
+
+-1
+
+Beverage 3 is made, but it is discarded because there is no order to assign it to.
+
+16
+
+order(555, 3, {3, 2, 1})
+
+2
+
+Order 555, which is made up of Beverages 3, 2, and 1, is taken.
+
+The remaining orders are Orders 222 and 555.
+
+17
+
+getStatus(222)
+
+1
+
+Since Beverage 2 remains in Order 222, the number of beverages remaining in the order is one.
+
+18
+
+supply(2)
+
+222
+
+Beverage 2 is made and assigned to Order 222.
+
+All beverages in Order 222 are made and delivered to the customer.
+
+19
+
+supply(3)
+
+555
+
+Beverage 3 is made and assigned to Order 555.
+
+In Order 555, only Beverages 2 and 1 remain.
+
+20
+
+supply(1)
+
+555
+
+Beverage 1 is made and assigned to Order 555.
+
+In Order 555, only Beverage 2 remains.
+
+21
+
+cancel(111)
+
+-1
+
+Order 111 has already been canceled.
+
+22
+
+order(666, 1, {1})
+
+2
+
+Order 666, which is made up of Beverage 1, is taken.
+
+The remaining orders are Orders 555 and 666.
+
+23
+
+order(777, 2, {3, 1})
+
+3
+
+Order 777, which is made up of Beverages 3 and 1, is taken.
+
+The remaining orders are Orders 555, 666, and 777.
+
+24
+
+order(888, 2, {1, 3})
+
+4
+
+Order 888, which is made up of Beverages 1 and 3, is taken.
+
+The remaining orders are Orders 555, 666, 777, and 888.
+
+25
+
+getStatus(333)
+
+0
+
+Order 333 is the order in which all beverages have already been made and delivered to the customer.
+
+26
+
+order(999, 2, {2, 3})
+
+5
+
+Order 999, which is made up of Beverages 2 and 3, is taken.
+
+The remaining orders are Orders 555, 666, 777, 888, and 999.
+
+27
+
+hurry()
+
+{5, {777, 888, 999, 555, 666}}
+
+In the order they arrive—Orders 555, 666, 777, 888, and 999—the number of beverages remaining is 1, 1, 2, 2, and 2, respectively. The most urgent orders are Orders 777, 888, 999, 555, and 666, in that order.
+
+28
+
+supply(1)
+
+666
+
+Beverage 1 is made and assigned to Order 666.
+
+All beverages in Order 666 are made and delivered to the customer.
+
+29
+
+cancel(222)
+
+0
+
+Since all beverages in Order 222 have already been made and delivered to the customer, it cannot be canceled.
+
+30
+
+getStatus(222)
+
+0
+
+Order 222 is the order in which all beverages have already been made and delivered to the customer.
+
+31
+
+getStatus(111)
+
+-1
+
+Order 111 has already been canceled.
+
+                                            [Table 1]
+
+ 
+
+[Constraints]
+
+1. Time Limit : 2 seconds in C++ and 3 seconds in Java for 50 test cases.
+
+2. init() is called once at the beginning of each test case.
+
+3. For each test case, order() is called up to 20,000 times.
+
+4. For each test case, supply() is called up to 50,000 times.
+
+5. For each test case, cancel() is called up to 1,000 times.
+
+6. For each test case, getStatus() is called up to 5,000 times.
+
+7. For each test case, hurry() is called up to 10,000 times.
+
+ 
+
+[Input and Output]
+
+As the input and output are processed in the provided code in the Main, they are not processed separately in the User Code.
+
+The output result for the sample input is printed in the format of “#TC number result.” It means Pass if the result is 100; it means Fail if the result is 0.
+
+
+
+
+
+
+/********************** User code *********************/
+#include <unordered_map>
+#include <set>
+#include <vector>
+#include <list>
+ 
+using namespace std;
+ 
+struct RESULT
+{
+    int cnt;
+    int IDs[5];
+};
+void init(int N);
+int order(int mID, int M, int mBeverages[]);
+int supply(int mBeverage);
+int cancel(int mID);
+int getStatus(int mID);
+RESULT hurry();
+ 
+struct beverage
+{
+    vector <int> sBeverage;       // Do uong da lam xong
+    int nCount;     // So luong do uong nay con lai
+    int nTime;      // Thoi gian thuc hien order
+    int isCancel;   // Da cancel hay chua?
+};
+ 
+// Urgrenr order
+struct HurryOrder
+{
+    int nCount;
+    int nID;
+    int nTime;
+};
+ 
+struct myComp
+{
+    bool operator()(const HurryOrder& x, const HurryOrder& y) const
+    {
+        if (x.nCount != y.nCount) return x.nCount > y.nCount;        // Giảm dần theo nCount
+        return x.nTime < y.nTime;        // Tăng dần theo thời gian nếu nCount bằng nhau
+    }
+};
+ 
+ 
+unordered_map <int, beverage> mOrder;
+set <struct HurryOrder, myComp> sHurry;
+list <int> mSuply[11];
+ 
+int nNumOrderRemain = 0;
+ 
+void init(int N)
+{
+    mOrder.clear();
+    sHurry.clear();
+    nNumOrderRemain = 0;
+     
+    for (int i = 0; i < 11; i++)
+    {
+        mSuply[i].clear();      // Reset supply list
+    }
+     
+    return;
+}
+ 
+int order(int mID, int M, int mBeverages[])
+{
+    static int nTime = 0;
+     
+    for (int i = 0; i < M; i++)
+    {
+        mSuply[mBeverages[i]].push_back(mID);
+    }
+     
+    mOrder[mID].nCount = M;
+    mOrder[mID].nTime = nTime++;        // Luu thoi gian thuc hien order
+    mOrder[mID].isCancel = 0;
+    nNumOrderRemain++;
+     
+    // Thêm vào set hurry
+    HurryOrder hOrder;
+    hOrder.nID = mID;
+    hOrder.nCount = M;
+    hOrder.nTime = mOrder[mID].nTime;
+    sHurry.insert(hOrder);
+     
+    return nNumOrderRemain;
+}
+ 
+int supply(int mBeverage)
+{
+    // Tim order co chua do uong nay
+    auto& it = mSuply[mBeverage];
+     
+    while (!it.empty())
+    {
+        int mID = it.front();
+        it.pop_front();
+         
+        if (!mOrder[mID].isCancel)
+        {
+            // Cập nhật set hurry
+            HurryOrder oldOrder;
+            oldOrder.nID = mID;
+            oldOrder.nCount = mOrder[mID].nCount;
+            oldOrder.nTime = mOrder[mID].nTime;
+            sHurry.erase(oldOrder);
+             
+            if (--mOrder[mID].nCount == 0)
+            {
+                nNumOrderRemain--;
+            }
+             
+            mOrder[mID].sBeverage.push_back(mBeverage);
+             
+            // Nếu order chưa hoàn thành, thêm lại vào set
+            if (mOrder[mID].nCount > 0) {
+                HurryOrder newOrder;
+                newOrder.nID = mID;
+                newOrder.nCount = mOrder[mID].nCount;
+                newOrder.nTime = mOrder[mID].nTime;
+                sHurry.insert(newOrder);
+            }
+             
+            return mID;
+        }
+    }
+     
+    // Neu khong co do uong nay trong order nao => return -1
+    return -1;
+}
+ 
+int cancel(int mID)
+{
+    // Neu da lam xong het do uong thi return 0
+    if (mOrder[mID].nCount == 0)
+    {
+        return 0;
+    }
+     
+    // Neu da cancel roi thi return -1
+    if (mOrder[mID].isCancel)
+    {
+        return -1;
+    }
+     
+    mOrder[mID].isCancel = 1;
+     
+    // Giam so luong order con lai
+    nNumOrderRemain--;
+     
+    // Xóa khỏi set hurry
+    HurryOrder hOrder;
+    hOrder.nID = mID;
+    hOrder.nCount = mOrder[mID].nCount;
+    hOrder.nTime = mOrder[mID].nTime;
+    sHurry.erase(hOrder);
+     
+    while (!mOrder[mID].sBeverage.empty())
+    {
+        supply(mOrder[mID].sBeverage.back());
+        mOrder[mID].sBeverage.pop_back();
+    }
+     
+    return mOrder[mID].nCount;
+}
+ 
+int getStatus(int mID)
+{
+    if (mOrder[mID].isCancel)
+    {
+        // Neu da cancel roi thi return -1
+        return -1;
+    }
+     
+    return mOrder[mID].nCount;
+}
+ 
+RESULT hurry()
+{
+    RESULT res = {0, {0}};
+    int Count = 0;
+     
+    for (auto it = sHurry.begin(); it != sHurry.end(); ++it)
+    {
+        if (Count < 5)
+        {
+            res.IDs[Count++] = it->nID;
+        }
+        else
+        {
+            break;
+        }
+    }
+     
+    res.cnt = Count;
+     
+    return res;
+}
+
+
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Queue;
+import java.util.TreeSet;
+ 
+class UserSolution {
+     
+    HashMap<Integer, Order> orderMap = new HashMap<>();
+    Queue<Order>[] q = new ArrayDeque[11];
+    TreeSet<Order> tree = new TreeSet<>();
+    int n;
+     
+    public void init(int N)
+    {
+        n = N;
+        orderMap.clear();
+        tree.clear();
+        for (int i = 0; i <= N; i++)
+            q[i] = new ArrayDeque<>();
+ 
+        return;
+    }
+ 
+    public int order(int mID, int M, int mBeverages[])
+    {
+        Order order = new Order();
+        order.drinksLeft = M;
+        order.id = mID;
+        order.time = orderMap.size(); // we can arrange order of arrival by the map size at the time the order is created
+        order.cancelled = false;
+         
+        // insert to map and tree
+        orderMap.put(mID, order);
+        tree.add(order);
+         
+        // loop through beverage id of the order and queue in the order id
+        for (int i = 0; i < M; i++)
+            q[mBeverages[i]].add(order);
+         
+        return tree.size();
+    }
+ 
+    public int supply(int mBeverage)
+    {
+        // assign to earliest arriving order and decrement beverage count from the order.
+        while(!q[mBeverage].isEmpty() && q[mBeverage].peek().cancelled)
+            q[mBeverage].poll();
+         
+        if (q[mBeverage].isEmpty()) return -1; // assignment fails
+         
+        // we can supply the beverage to an order at this point, poll the queue
+        Order order = q[mBeverage].poll();
+        tree.remove(order); // remove from tree since we are updating the count;
+        order.drinksLeft -= 1;
+        order.supply.add(mBeverage);
+        if (order.drinksLeft > 0)
+            tree.add(order); // re-add to tree
+         
+        return order.id;
+    }
+ 
+    public int cancel(int mID)
+    {
+        Order order = orderMap.get(mID);
+        if (order.cancelled) return -1;
+        if (order.drinksLeft == 0) return 0;
+         
+        order.cancelled = true;
+        int left = order.drinksLeft;
+        for (int bev : order.supply)
+            supply(bev);
+        tree.remove(order);
+         
+        return left;
+    }
+ 
+    public int getStatus(int mID)
+    {
+        Order order = orderMap.get(mID);
+        if (order.drinksLeft == 0) return 0;
+        if (order.cancelled) return -1;
+        return order.drinksLeft;
+    }
+ 
+    Solution.RESULT hurry()
+    {
+        Solution.RESULT res = new Solution.RESULT();
+        res.cnt = 0;
+        for (Order order : tree) {
+            res.IDs[res.cnt++] = order.id;
+            if (res.cnt == 5)
+                break;
+        }
+        return res;
+    }
+     
+     
+    static class Order implements Comparable<Order> {
+        int drinksLeft;
+        List<Integer> supply = new ArrayList<>();
+        int time;
+        int id;
+        boolean cancelled;
+         
+        @Override
+        public int compareTo(Order otherOrder) {
+            if (this.drinksLeft == otherOrder.drinksLeft) {
+                return this.time - otherOrder.time;
+            }
+             
+            return otherOrder.drinksLeft - this.drinksLeft;
+        }
+    }
+}
+
+
