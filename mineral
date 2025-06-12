@@ -1,0 +1,144 @@
+#include<iostream>
+#include<vector>
+#include<unordered_map>
+#include<algorithm>
+ 
+using namespace std;
+#define MAXADD 20005
+#define ROWCOL 31
+ 
+struct node {
+    int id;
+    int x;
+    int y;
+    int quantity;   
+}db[MAXADD];
+ 
+vector <int> varr[ROWCOL][ROWCOL];
+int parent[MAXADD];
+int maxCap[MAXADD];
+int gidx = 0; 
+int limit, gN;
+// int dx[4] = {0, 1, 0,-1};
+// int dy[4] = {1, 0,-1, 0};
+ 
+void init(int L, int N){
+    gidx = 0;
+    limit = L;
+    gN = N;
+    for (int i = 0; i < MAXADD; i++) {
+        parent[i] = i;
+        maxCap[i] = 0;
+    }
+    for (int i = 0; i < ROWCOL; i++) {
+        for (int j = 0; j < ROWCOL; j++) {
+            varr[i][j].clear();
+        }
+    }
+    return;
+}
+ 
+int findparent(int id) {
+    while (id != parent[id]) {
+        id = parent[id];
+    }
+    return id;
+}
+ 
+void merge(int a, int b) {
+    int groupA = findparent(a);
+    int groupB = findparent(b);
+ 
+    if (groupA != groupB) {
+        parent[groupB] = groupA;
+        maxCap[groupA] += maxCap[groupB];
+    }
+    return;
+}
+ 
+int addBaseCamp(int mID, int mRow, int mCol, int mQuantity) {
+    gidx++; 
+    db[gidx].id = mID;
+    db[gidx].x = mRow;
+    db[gidx].y = mCol;
+    db[gidx].quantity = mQuantity;
+    maxCap[gidx] = mQuantity;
+ 
+    int cX = mRow / limit;
+    int cY = mCol / limit;
+ 
+    //for (int i = 0; i < 4; i++) {
+    //  for (int j = 0; j < 4; j++) {
+    //      int nX = cX + dx[i];
+    //      int nY = cY + dy[j];
+    //      if (nX >= 0 && nY >= 0 && nX <= gN / limit && nY <= gN / limit) {
+    //          for (auto idx : varr[nX][nY]) {
+    //              int dist = abs(db[idx].x - mRow) + abs(db[idx].y - mCol);
+    //              if (dist <= limit) {
+    //                  merge(idx, gidx);
+    //              }
+    //          }
+    //      }
+    //  }
+    //} 
+ 
+    for (int i = max(cX - 1, 0); i <= min(cX + 1, 29); i++) {
+        for (int j = max(cY - 1, 0); j <= min(cY + 1, 29); j++) {
+            for (auto idx : varr[i][j]) {
+                int dist = abs(db[idx].x - mRow) + abs(db[idx].y - mCol);
+                if (dist <= limit) {
+                    merge(idx, gidx);
+                }
+            }
+        }
+    }
+    varr[cX][cY].push_back(gidx);
+    int id = findparent(gidx);
+    int ans = maxCap[id];
+    return ans;
+}
+ 
+int  findMinId(int id1, int id2) {
+    if (db[id1].quantity < db[id2].quantity) {
+        return id1;
+    }
+    if (db[id1].quantity > db[id2].quantity) {
+        return id2;
+    }
+    if (db[id1].quantity == db[id2].quantity) {
+        if (db[id1].x < db[id2].x) {
+            return id1;
+        }
+        if (db[id1].x > db[id2].x) {
+            return id2;
+        }
+        if (db[id1].x == db[id2].x) {
+                if (db[id1].y < db[id2].y) {
+                    return id1;
+                }
+                else {
+                    return id2;
+                }
+        }
+    }       
+}
+ 
+int findBaseCampForDropping(int K)
+{
+    int ans = -1;
+    for (int i = 0; i <= gidx; i++) {
+        int pid = findparent(i);
+        if (maxCap[pid] >= K) {
+            if (ans == -1) {
+                ans = i;
+            }
+            else {
+                ans=findMinId(i, ans);
+                 
+            }
+        }
+    }
+    if (ans == -1)
+        return ans;
+    return db[ans].id;
+}
