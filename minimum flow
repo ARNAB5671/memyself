@@ -1,0 +1,174 @@
+Flow network is a directed graph where each edge has a capacity and each edge receives a flow. The amount of flow on an edge can't exceed the capacity of the edge. A network is at maximum flow if there is no augmentable path between a source S and a sink T.
+
+[Problem]
+Print the maximum flow for a given graph with V vertices and E edges.
+
+[Input]
+The first input line contains the number of test cases, T.
+The second line contains the number of vertices, V (2 <= V <= 10) and the number of edges, E (2 <= E <= 20).
+Throughout the following E lines, each edge's source, sink and capacity will be listed.
+
+[Output]
+For each test case, print the maximum flow.
+
+Input	Output
+2 // number of Test cases
+6 10 // Number of vertices and edges
+0 1 16
+0 2 13
+1 2 10
+1 3 12
+2 1 4
+2 4 14
+3 2 9
+3 5 20
+4 3 7
+4 5 4
+6 7
+0 1 10
+0 3 8
+1 2 10
+1 4 6
+2 5 10
+3 2 8
+4 5 6
+#1 23
+#2 16
+C / C++
+JAVA
+Python
+#include <stdio.h>
+
+#define MAX_V 10
+
+const int INF = 987654321;
+int V;
+
+typedef struct
+{
+	int queueArray[MAX_V];
+	int front;
+	int rear;
+}Queue;
+
+void push(Queue *q, int item)  
+{
+	if ((q->rear + 1) % MAX_V == q->front)
+	{
+		return;
+	}
+	q->queueArray[q->rear] = item;
+	q->rear = (q->rear + 1) % MAX_V;
+}
+void pop(Queue * q)
+{
+	if (q->front == q->rear)
+	{
+		return;
+	}
+	q->front = (q->front + 1) % MAX_V;
+}
+
+int getFront(Queue * q)
+{
+	return q->queueArray[q->front];
+}
+
+int isEmpty(Queue *q)
+{
+	if (q->rear == q->front) 
+	{ 
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+int networkFlow(int source, int sink, int capacity[][MAX_V])
+{
+	int flow[MAX_V][MAX_V] = { 0, };
+	int parent[MAX_V];
+	int totalFlow = 0;
+	int p;
+	while (1)
+	{
+		for (p = 0; p < V; p++)
+		{
+			parent[p] = -1;
+		}
+
+		Queue q;
+		
+		q.front = 0;
+		q.rear = 0;
+
+		parent[source] = source;
+		push(&q, source);
+
+		while (!isEmpty(&q)) 
+		{
+			int here = getFront(&q); pop(&q);
+			int there;
+			for (there = 0; there < V; ++there) 
+			{
+				if (capacity[here][there] - flow[here][there] > 0 && parent[there] == -1)
+				{
+					push(&q, there);
+					parent[there] = here;
+				}
+			}
+		}
+		if (parent[sink] == -1)
+		{
+			break;
+		}
+
+		int amount = INF;
+		for (p = sink; p != source; p = parent[p]) 
+		{
+			if (capacity[parent[p]][p] - flow[parent[p]][p] > amount) 
+			{
+				amount = amount;
+			}
+			else {
+				amount = capacity[parent[p]][p] - flow[parent[p]][p];
+			}
+		}
+
+		for (p = sink; p != source; p = parent[p]) 
+		{
+			flow[parent[p]][p] += amount;
+			flow[p][parent[p]] -= amount;
+		}
+		totalFlow += amount;
+	}
+	return totalFlow;
+}
+
+int main(int argc, char** argv)
+{
+	int T;
+
+	setbuf(stdout, NULL);
+	scanf("%d", &T);
+
+	for (int test_case = 1; test_case <= T; ++test_case)
+	{
+		int capacity[MAX_V][MAX_V] = { 0, };
+		int E, here, there, C, answer;
+
+		scanf("%d %d", &V, &E);
+		for (int i = 0; i < E; ++i) 
+		{
+			scanf("%d %d %d", &here, &there, &C);
+			capacity[here][there] = C;
+		}
+
+		answer = networkFlow(0, V - 1, capacity);
+
+		printf("#%d %d\n", test_case, answer);
+	}
+	return 0;
+}
