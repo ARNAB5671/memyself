@@ -1,0 +1,174 @@
+#include<bits/stdc++.h>
+using namespace std;
+ 
+struct RESULT
+{
+    int cnt = 0;
+    int IDs[5] = {0, 0, 0, 0, 0};
+};
+ 
+const int MX = 2e3 + 5;
+int vis[MX][MX];
+int d;
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+ 
+struct Worm {
+    int id;
+    pair<int,int> s,t;
+    int length;
+    int dir;
+    int potential;
+    bool dead;
+};
+ 
+int worm_cnt;
+int timer;
+Worm worms[MX];
+set<int> worms_left;
+ 
+void erase(int id) {
+    worms[id].dead = true;
+    int sx = worms[id].s.first;
+    int sy = worms[id].s.second;
+    int tx = worms[id].t.first;
+    int ty = worms[id].t.second;
+     
+    while (sx != tx && sy != ty) {
+        vis[sx][sy] = -1;
+        sx -= dx[worms[id].dir];
+        sy -= dy[worms[id].dir];
+    }
+     
+    if (sx == tx) {
+        for (int i = min(sy, ty); i <= max(sy, ty); i++) vis[sx][i] = -1;
+    } else {
+        for (int i = min(sx, tx); i <= max(sx, tx); i++) vis[i][sy] = -1;
+    }
+}
+ 
+bool start = true;
+void init(int N) {
+    if (start) {
+        for (int i = 0; i < MX; i++) for (int j = 0; j < MX; j++) vis[i][j] = -1;
+        start = false;
+    }
+     
+    d = N;
+    for (int i = 0; i < worm_cnt; i++) {
+        if (worms[i].dead) continue;
+        erase(i);
+    }
+    worm_cnt = 0;
+    timer = 0;
+    worms_left = move(set<int>());
+}
+ 
+void simulate() {
+    timer++;
+    for (auto i: worms_left) {
+        auto &worm = worms[i];
+        if (worm.dead) continue;
+        int sx = worm.s.first;
+        int sy = worm.s.second;
+        int tx = worm.t.first;
+        int ty = worm.t.second;
+        if (sx == tx || sy == ty) worm.dir = (worm.dir + 1) % 4;
+         
+        if (worm.potential) {
+            worm.potential--;
+            worm.length++;
+        } else {
+            vis[tx][ty] = -1;
+            tx += dx[(worm.dir + 3) % 4];
+            ty += dy[(worm.dir + 3) % 4];
+            worm.t = {tx, ty};
+        }
+    }
+     
+    vector<int> kill;
+    for (auto i: worms_left) {
+        auto &worm = worms[i];
+        if (worm.dead) continue;
+        int sx = worm.s.first;
+        int sy = worm.s.second;
+         
+        sx += dx[worm.dir];
+        sy += dy[worm.dir];
+        if (sx < 0 || sx >= d || sy < 0 || sy >= d) {
+            kill.push_back(i);
+            continue;
+        }
+         
+        if (vis[sx][sy] == -1) {
+            vis[sx][sy] = i;
+            worm.s = {sx, sy};
+            continue;
+        }
+         
+        kill.push_back(i);
+        int id = vis[sx][sy];
+        worms[id].potential += worm.length;
+        if (id < i && worms[id].s == make_pair(sx, sy)) kill.push_back(id);
+    }
+     
+    for (auto i: kill) {
+        if (worms[i].dead) continue;
+        erase(i);
+        worms_left.erase(i);
+    }
+}
+ 
+void join(int mTime, int mID, int mX, int mY, int mLength) {
+    swap(mX, mY);
+    while (timer < mTime) simulate();
+     
+    Worm worm;
+    worm.id = mID;
+    worm.length = mLength;
+    worm.dir = 0;
+    worm.potential = 0;
+    worm.dead = false;
+     
+    worm.s = {mX, mY};
+    worm.t = {mX + mLength - 1, mY};
+    for (int i = 0; i < mLength; i++) {
+        vis[mX + i][mY] = worm_cnt;
+    }
+    worms[worm_cnt] = worm;
+    worms_left.insert(worm_cnt);
+    worm_cnt++;
+}
+ 
+bool compare(Worm a, Worm b) {
+    if (a.length != b.length) return a.length > b.length;
+    return a.id > b.id;
+}
+ 
+RESULT top5(int mTime) {
+    while (timer < mTime) simulate();
+     
+    Worm sen;
+    sen.length = -1;
+    vector<Worm> check(5, sen);
+     
+    for (int i = 0; i < worm_cnt; i++) {
+        if (worms[i].dead) continue;
+         
+        if (compare(worms[i], check[4])) {
+            check[4] = worms[i];
+            for (int j = 3; j >= 0; j--) {
+                if (compare(check[j + 1], check[j])) swap(check[j], check[j + 1]);
+                else break;
+            }
+        }
+    }
+     
+    RESULT ret = RESULT();
+    for (int i = 0; i < 5; i++) {
+        if (check[i].length == -1) break;
+        ret.cnt++;
+        ret.IDs[i] = check[i].id;
+    }
+    return ret;
+}
